@@ -7,26 +7,27 @@ import sys
 user_path = os.environ.get("USER_PATH")
 sys.path.append(user_path)
 
-from data_structures import min_heap as heap
+from data_structures.min_heap import MinHeap
 
 
-def optimal_merge(patterns):
+def optimal_merge(heap):
     min_cost = 0
-    while len(patterns):
-        min_first = heap.extract_min(patterns)
-        if len(patterns):
-            min_second = heap.extract_min(patterns)
+    while len(heap):
+        min_first = heap.extract_min()
+        if len(heap):
+            min_second = heap.extract_min()
             min_cost += min_first
             min_cost += min_second
         else:
             break
-        heap.insert(patterns, min_first + min_second)
+        heap.insert(min_first + min_second)
 
     return min_cost
     
     
 if __name__ == "__main__":
     patterns = [10,20,30]
-    heap.build_min_heap(patterns)
-    min_cost = optimal_merge(patterns)
+    heap = MinHeap(patterns)
+    heap.build_heap()
+    min_cost = optimal_merge(heap)
     print("MIN COST", min_cost)
