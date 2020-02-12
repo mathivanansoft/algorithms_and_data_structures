@@ -7,7 +7,7 @@ import sys
 user_path = os.environ.get("USER_PATH")
 sys.path.append(user_path)
 
-from data_structures import min_heap as heap
+from data_structures.min_heap import MinHeap
 
 class K_Ordered(object):
     def __init__(self, data, kind, next_index):
@@ -52,11 +52,11 @@ def find_minimum_range(source):
         if obj > maximum:
             maximum = obj
 
-    heap.build_min_heap(arr)
+    heap = MinHeap(arr)
+    heap.build_heap()
 
-    
     while True:
-        minimum = heap.extract_min(arr)
+        minimum = heap.extract_min()
         if range_ > (maximum.data - minimum.data + 1):
             range_ = (maximum.data - minimum.data + 1)
             start = minimum.data
@@ -65,7 +65,7 @@ def find_minimum_range(source):
         if minimum.next_index < len(source[minimum.kind]):
             elmnt = source[minimum.kind][minimum.next_index]
             temp = K_Ordered(elmnt, minimum.kind, minimum.next_index+1)
-            heap.insert(arr, temp)
+            heap.insert(temp)
 
             if temp > maximum:
                 maximum = temp
