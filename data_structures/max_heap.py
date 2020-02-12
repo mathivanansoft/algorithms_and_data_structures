@@ -1,5 +1,5 @@
 class MaxHeap(object):
-    def __init__(self, arr):
+    def __init__(self, arr=[]):
         self.arr = arr
 
     def build_heap(self):
@@ -37,7 +37,7 @@ class MaxHeap(object):
             self.heapify(0)
             return maximum
 
-    def insert(elmnt):
+    def insert(self, elmnt):
         self.arr.append(elmnt)
         l = len(self.arr) - 1
         parent = l // 2
