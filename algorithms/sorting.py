@@ -48,8 +48,8 @@ def partition(arr, start, end):
 
 def merge_sort(arr):
 	if len(arr) < 2:
-		return None
-	mid = len(arr)/2
+		return arr
+	mid = len(arr)//2
 	left = arr[:mid]
 	right = arr[mid:]
 	merge_sort(left)
@@ -72,12 +72,12 @@ def merge(arr, left, right):
 		pos +=1
 
 	while i< l:
-		arr[pos] = left[l]
+		arr[pos] = left[i]
 		i +=1
 		pos +=1
 	while j<r:
 		arr[pos] = right[j]
-		i +=1
+		j +=1
 		pos +=1
 
 if __name__ == '__main__':
@@ -96,5 +96,5 @@ if __name__ == '__main__':
 	print ('quick_sort', arr2)
 
 	arr3 = [9,1,8,2,6,4,3,7,5]
-	quick_sort(arr3, 0, 8)
+	merge_sort(arr3)
 	print ('merge_sort', arr3)
