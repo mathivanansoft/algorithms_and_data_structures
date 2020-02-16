@@ -13,7 +13,9 @@ class Queue(object):
         if len(self.arr) != 0:
             return self.arr.pop(0)
         else:
-            raise Exception("Queue undeflow")
+            raise Exception("Queue underflow")
+
+
 
 if __name__ == "__main__":
     q = Queue(3)

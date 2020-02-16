@@ -1,19 +1,23 @@
-class Stack(object):
+class Stack(list):
     def __init__(self, size):
+        list.__init__(self, [])
         self.size = size
-        self.arr = []
 
     def push(self, data):
-        if self.size > len(self.arr):
-            self.arr.append(data)
+        if self.size > len(self):
+            self.append(data)
         else:
             raise Exception("Stack overflow")
 
     def pop(self):
-        if len(self.arr) != 0:
-            return self.arr.pop()
+        if len(self) != 0:
+            return list.pop(self)
         else:
             raise Exception("Stack underflow")
+
+    def __repr__(self):
+        return "{0} {1}".format(self.size, list(self).__str__())
+
 
 if __name__ == "__main__":
     s = Stack(5)
@@ -21,6 +25,6 @@ if __name__ == "__main__":
     s.push(2)
     s.push(3)
     s.push(4)
-    print("After pushed", s.arr)
+    print("After pushed", s)
     s.pop()
-    print("After popped", s.arr)
+    print("After popped", s)
