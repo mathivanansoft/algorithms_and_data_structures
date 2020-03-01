@@ -50,8 +50,8 @@ class BSTree(BinaryTree):
         return node
 
 
-    def in_order_successor(self, key):
-        return self.__in_order_successor(self.root, key, None)
+    def in_order_successor(self, node, key):
+        return self.__in_order_successor(node, key, None)
 
     def __in_order_successor(self, node, key, successor):
         if node is None:
@@ -77,8 +77,8 @@ class BSTree(BinaryTree):
             temp = temp.left
         return temp
 
-    def in_order_predecessor(self, key):
-        return self.__in_order_predecessor(self.root, key, self.root)
+    def in_order_predecessor(self, node, key):
+        return self.__in_order_predecessor(node, key, self.root)
 
     def __in_order_predecessor(self, node, key, predecessor):
         if node is None:
