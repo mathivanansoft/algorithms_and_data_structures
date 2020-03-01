@@ -39,3 +39,30 @@ class BinaryTree(object):
         self.__post_order_traversal(node.left)
         self.__post_order_traversal(node.right)
         print(node)
+
+
+    def level_order_traversal(self):
+        if self.root is None:
+            return
+
+        arr = []
+        arr.append(self.root)
+
+        while len(arr):
+            node = arr.pop(0)
+            print(node)
+            if node.left is not None:
+                arr.append(node.left)
+            if node.right is not None:
+                arr.append(node.right)
+
+    def size(self):
+        return self.__size(self.root)
+
+    def __size(self, node):
+        if node is None:
+            return 0
+
+        left = self.__size(node.left)
+        right = self.__size(node.right)
+        return 1 + left + right
