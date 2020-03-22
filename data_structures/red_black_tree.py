@@ -131,6 +131,168 @@ class RedBlackTree(BSTree):
 
         return node            
 
+    def __case3a(self, parent):
+        # bb = double blackness
+        # parent = bb's parent
+        # sibling = bb's sibling
+
+        # case 3
+        # sibling is black and its children is either black or None
+        # a) parent is red and sibling is right child of P
+
+        bb = parent.left
+        sibling = parent.right
+        parent.color = "B"
+        sibling.color = "R"
+        bb.color = "B"
+        if bb.data is None:
+            parent.left = None
+        return parent
+
+    def __case3b(self, parent):
+        # b) parent is red and sibling is left child of P
+
+        bb = parent.right
+        sibling = parent.left
+        parent.color = "B"
+        sibling.color = "R"
+        bb.color = "B"
+        if bb.data is None:
+            parent.right = None
+        return parent
+
+    def __case3c(self, parent):
+        # c) parent is black and sibling is right child of P
+
+        bb = parent.left
+        sibling = parent.right
+        parent.color = "BB"
+        sibling.color = "R"
+        bb.color = "B"
+        if bb.data is None:
+            parent.left = None
+        return parent
+
+    def __case3d(self, parent):
+        # d) parent is black and sibling is left child of P
+
+        bb = parent.right
+        sibling = parent.left
+        parent.color = "BB"
+        sibling.color = "R"
+        bb.color = "B"
+        if bb.data is None:
+            parent.right = None
+        return parent
+
+    def __case4a(self, parent):
+        # this case does n't remove double blackness
+        # it switches to other case
+        # sibling is red
+        # a) sibling is right child of p
+
+        bb = parent.left
+        sibling = parent.right
+        parent.color = "R"
+        sibling.color = "B"
+
+        parent.right = sibling.left
+        sibling.left = self.__check_cases(sibling.left)
+        return sibling
+
+    def __case4b(self, parent):
+        # b) sibling is left child of p
+
+        bb = parent.right
+        sibling = parent.left
+        parent.color = "R"
+        sibling.color = "B"
+
+        parent.left = sibling.right
+        sibling.right = parent
+        sibling.right = self.__check_cases(sibling.right)
+
+        return sibling
+
+    def __case5a(self, parent):
+        # sibling is black and sibling's right children is red
+        # and sibling is right child of p
+
+        bb = parent.left
+        sibling = parent.right
+        temp_color = parent.color
+        parent.color = sibling.color
+        sibling.color = temp_color
+        sibling.right.color = "B"
+        #left rotate
+        parent.right = sibling.left
+        sibling.left = parent
+
+        if bb.data is None:
+            parent.left = None
+        else:
+            parent.left.color = "B"
+
+        return sibling
+
+    def __case5b(self, parent):
+        # sibling is black and sibling's left children is red
+        # and sibling is left child of p
+
+        bb = parent.right
+        sibling = parent.left
+        temp_color = parent.color
+        parent.color = sibling.color
+        sibling.color = temp_color
+        sibling.left.color = "B"
+        #right rotate
+
+        parent.left = sibling.right
+        sibling.right = parent
+
+        if bb.data is None:
+            parent.right = None
+        else:
+            parent.right.color = "B"
+
+        return sibling
+
+    def __case6a(self, parent):
+        # sibling is black and sibling's right children is black
+        # and sibling's left children is red
+        # and sibling is right child of p
+
+        bb = parent.left
+        sibling = parent.right
+        sl = sibling.left
+        sr = sibling.right
+
+        temp_color = sibling.color
+        sibling.color = sl.color
+        sl.color = temp_color
+
+        sibling.left = sl.right
+        sl.right = sibling
+        return sl
+
+    def __case6b(self, parent):
+        # sibling is black and sibling's left children is black
+        # and sibling's right children is red
+        # and sibling is left child of p
+
+        bb = parent.right
+        sibling = parent.left
+        sl = sibling.left
+        sr = sibling.right
+
+        temp_color = sibling.color
+        sibling.color = sr.color
+        sr.color = temp_color
+
+        sibling.right = sr.left
+        sr.left = sibling
+        return sr
+
     def delete(self, key):
         self.root = self.__delete(self.root, key)
         if self.root is not None:
@@ -140,6 +302,16 @@ class RedBlackTree(BSTree):
                 self.root.color = "B"
             if self.root.data is None:
                 self.root = None
+
+    def is_left_dd(self, parent):
+        if parent.left is not None and parent.left.color == "BB":
+            return True
+        return False
+
+    def is_right_dd(self, parent):
+        if parent.right is not None and parent.right.color == "BB":
+            return True
+        return False
 
     def __delete(self, node, key):
         if node is None:
@@ -159,6 +331,10 @@ class RedBlackTree(BSTree):
                     return node.right
                 elif node.right is None:
                     return node.left
+                else:
+                    in_order = self.in_order_successor(node, node.data)
+                    node.data = in_order.data
+                    node.right = self.__delete(node.right, in_order.data)
 
             elif node.color == "B":
                 if node.left is None and node.right is None:
@@ -176,232 +352,61 @@ class RedBlackTree(BSTree):
                     node.data = in_order.data
                     node.right = self.__delete(node.right, in_order.data)
 
-                # return node
+        return self.__check_cases(node)
 
-
-        parent = node
-        case4a = False
-        case4b = False
-
-        # case 4
-        if parent.left and parent.left.color == "BB":
+    def __check_cases(self, parent):
+        if self.is_left_dd(parent):
             sibling = parent.right
-            if sibling and sibling.color == "R":
-                sibling.color = "B"
-                parent.color = "R"
-                #Left rotate
-                parent.right = sibling.left
-                sibling.left = parent
-                temp = sibling
-                case4a = True
-        elif parent.right and parent.right.color == "BB":
+
+            if sibling.color == "B":
+                sl = sibling.left
+                sr = sibling.right
+
+                if sr is not None and sr.color == "R":
+                    return self.__case5a(parent)
+
+                if ((sl is None and sr is None)
+                    or ((sl is not None and sr is not None)
+                    and (sl.color == "B" and sr.color == "B"))):
+                    if parent.color == "R":
+                        parent = self.__case3a(parent)
+                    else:
+                        parent = self.__case3c(parent)
+
+                elif (sr is None or sr.color == "B") and sl.color == "R":
+                    parent.right = self.__case6a(parent)
+                    return self.__case5a(parent)
+            else:
+                sl = sibling.left
+                sr = sibling.right
+                return self.__case4a(parent)
+
+
+        elif self.is_right_dd(parent):
             sibling = parent.left
-            if sibling and sibling.color == "R":
-                sibling.color = "B"
-                parent.color = "R"
-                #Right rotate
-                parent.left = sibling.right
-                sibling.right = parent
-                temp = sibling
-                case4b = True
 
-        # sibling represents double blackness sibling
-        # case 3:
-        # sibling is black and its children are black or None
-        # a) parent P is Red & sibling is right child of P
-        # b) parent P is Red & sibling is left child of P
+            if sibling.color == "B":
+                sl = sibling.left
+                sr = sibling.right
 
-        if parent.color == "R":
-            if parent.left and parent.left.color == "BB":
-                sibling = parent.right
-                if sibling and sibling.left and sibling.right:
-                    if sibling.color == "B" and sibling.left.color == "B" \
-                        and sibling.right.color == "B":
-                            sibling.color = "R"
-                            parent.color = "B"
-                            parent.left.color = "B"
-                            if parent.left.data is None:
-                                parent.left = None
-                            if case4a:
-                                return temp
-                            return parent
+                if sl is not None and sl.color == "R":
+                    return self.__case5b(parent)
 
-                elif sibling and sibling.color == "B" \
-                    and sibling.left is None and sibling.right is None:
-                        sibling.color = "R"
-                        parent.color = "B"
-                        parent.left.color = "B"
-                        if parent.left.data is None:
-                            parent.left = None
-                        if case4a:
-                            return temp
-                        return parent
+                if ((sl is None and sr is None)
+                    or ((sl is not None and sr is not None)
+                    and (sl.color == "B" and sr.color == "B"))):
+                    if parent.color == "R":
+                        parent = self.__case3b(parent)
+                    else:
+                        parent = self.__case3d(parent)
 
-            elif parent.right and parent.right.color == "BB":
-                sibling = parent.left
-                if sibling and sibling.left and sibling.right:
-                    if sibling.color == "B" and sibling.left.color == "B" \
-                        and sibling.right.color == "B":
-                            sibling.color = "R"
-                            parent.color = "B"
-                            parent.right.color = "B"
-                            if parent.right.data is None:
-                                parent.right = None
-                            if case4b:
-                                return temp
-                            return parent
-                elif sibling and sibling.color == "B" \
-                    and sibling.left is None and sibling.right is None:
-                        sibling.color = "R"
-                        parent.color = "B"
-                        parent.right.color = "B"
-                        if parent.right.data is None:
-                            parent.right = None
-                        if case4b:
-                            return temp
-                        return parent
+                elif (sl is None or sl.color == "B") and sr.color == "R":
+                    parent.left = self.__case6b(parent)
+                    return self.__case5b(parent)
+            else:
+                sl = sibling.left
+                sr = sibling.right
 
-        # case 3:
-        # c) parent P is Black & sibling is right child of P
-        # d) parent P is Black & sibling is left child of P
-        elif parent.color == "B":
-            if parent.left and parent.left.color == "BB":
-                sibling = parent.right
-                if sibling and sibling.left and sibling.right:
-                    if sibling.color == "B" and sibling.left.color == "B" \
-                        and sibling.right.color == "B":
-                            parent.color = "BB"
-                            sibling.color = "R"
-                            parent.left.color = "B"
-                            if parent.left.data is None:
-                                parent.left = None
-                            return parent
-                        # case 5a
-                    elif sibling and sibling.color == "B" and sibling.right \
-                        and sibling.right.color == "R":
-                            print(parent, sibling)
-                            sibling_color = sibling.color
-                            sibling.color = parent.color
-                            parent.color = sibling_color
-                            sibling.right.color = "B"
-                            # Left Rotate
-                            parent.right = sibling.left
-                            sibling.left = parent
-                            parent.left.color = "B"
-                            if parent.left.data is None:
-                                parent.left = None
-                            return sibling
-                elif sibling and sibling.color == "B" \
-                    and sibling.left is None and sibling.right is None:
-                            parent.color = "BB"
-                            sibling.color = "R"
-                            parent.left.color = "B"
-                            if parent.left.data is None:
-                                parent.left = None
-                            return parent
+                return self.__case4b(parent)
 
-            elif parent.right and parent.right.color == "BB":
-                sibling = parent.left
-                if sibling and sibling.left and sibling.right:
-                    if sibling.color == "B" and sibling.left.color == "B" \
-                        and sibling.right.color == "B":
-                            sibling.color = "R"
-                            parent.color = "BB"
-                            parent.right.color = "B"
-                            if parent.right.data is None:
-                                parent.right = None
-                            return parent
-                elif sibling and sibling.color == "B" \
-                    and sibling.left is None and sibling.right is None:
-                        sibling.color = "R"
-                        parent.color = "BB"
-                        parent.right.color = "B"
-                        if parent.right.data is None:
-                            parent.right = None
-                        return parent
-        
-        return node
-
-
-if __name__ == "__main__":
-    r = RedBlackTree()
-    # r.insert(5)
-    # r.insert(3)
-    # r.insert(7)
-    # r.insert(1)
-    # r.insert(4)
-    # r.insert(9)
-    # r.insert(6)
-    # r.insert(10)
-    
-    # r.insert(11)
-    # r.insert(3)
-    # r.insert(14)
-    # r.insert(15)
-    # r.insert(1)
-    # r.insert(7)
-    # r.insert(-1)
-    # r.insert(2)
-    # r.insert(5)
-    # r.insert(8)
-    
-    # insertion
-    b = RedBlackTree()
-    b.insert(23)
-    b.insert(5)
-    b.insert(30)
-    b.insert(14)
-    b.insert(17)
-    b.insert(40)
-    b.insert(45)
-    b.insert(27)
-    b.insert(29)
-    b.insert(26)
-    b.pre_order_traversal()
-    
-    r = RedBlackTree()
-    r.insert(30)
-    r.insert(20)
-    r.insert(60)
-    r.insert(10)
-    r.insert(25)
-    r.insert(40)
-    r.insert(80)
-
-    #case4a
-    r = RedBlackTree()
-    r.insert(30)
-    r.insert(10)
-    r.insert(5)
-    r.insert(20)
-    r.insert(70)
-    r.insert(50)
-    r.insert(100)
-    r.insert(80)
-    r.insert(110)
-
-    #case4b
-    r = RedBlackTree()
-    r.insert(50)
-    r.insert(30)
-    r.insert(70)
-    r.insert(20)
-    r.insert(40)
-    r.insert(10)
-    r.insert(25)
-    r.insert(60)
-    r.insert(80)
-
-    r.root.left.left.color="R"
-    r.root.left.left.left.color="B"
-    r.root.left.left.right.color="B"
-    r.root.right.left.color="B"
-    r.root.right.right.color="B"
-    
-    # case 5a
-    r = RedBlackTree()
-    r.insert(30)
-    r.insert(10)
-    r.insert(50)
-    r.insert(40)
-    r.insert(60)
+        return parent
