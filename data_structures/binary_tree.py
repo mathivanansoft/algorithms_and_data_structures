@@ -4,10 +4,10 @@ class BinaryTree(object):
     def __init__(self):
         self.root = None
 
-
-    def pre_order_traversal(self):
-        self.__pre_order_traversal(self.root)
-
+    def pre_order_traversal(self, node=None):
+        if node is None:
+            node = self.root
+        self.__pre_order_traversal(node)
 
     def __pre_order_traversal(self, node):
         if node is None:
@@ -16,10 +16,10 @@ class BinaryTree(object):
         self.__pre_order_traversal(node.left)
         self.__pre_order_traversal(node.right)
 
-
-    def in_order_traversal(self):
-        self.__in_order_traversal(self.root)
-
+    def in_order_traversal(self, node=None):
+        if node is None:
+            node = self.root
+        self.__in_order_traversal(node)
 
     def __in_order_traversal(self, node):
         if node is None:
@@ -28,10 +28,10 @@ class BinaryTree(object):
         print(node)
         self.__in_order_traversal(node.right)
 
-
-    def post_order_traversal(self):
-        self.__post_order_traversal(self.root)
-
+    def post_order_traversal(self, node=None):
+        if node is None:
+            node = self.root
+        self.__post_order_traversal(node)
 
     def __post_order_traversal(self, node):
         if node is None:
@@ -39,7 +39,6 @@ class BinaryTree(object):
         self.__post_order_traversal(node.left)
         self.__post_order_traversal(node.right)
         print(node)
-
 
     def level_order_traversal(self):
         if self.root is None:
